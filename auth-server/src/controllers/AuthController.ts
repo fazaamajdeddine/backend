@@ -14,6 +14,8 @@ const cookieOptions = {
     expires: expirationDate,
     secure: false,
     httpOnly: true,
+    path: '/', // Allow the cookie to be sent to all routes
+
 };
 
 const register = async (req: Request, res: Response) : Promise<void> => {
