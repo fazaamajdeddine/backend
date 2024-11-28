@@ -5,15 +5,21 @@ enum Preferences {
     Fantasy = "Fantasy",
     ScienceFiction = "Science Fiction",
     Mystery = "Mystery",
-    Friendship = "Friendship"
+    Friendship = "Friendship",
+}
+
+enum Gender {
+    Male = "Male",
+    Female = "Female",
 }
 
 export interface IKid extends Document {
-    name: string,
-    dateOfBirth: Date,
-    parentId:string,
-    institutionId:string,
-    preferences:Preferences,
+    name: string;
+    dateOfBirth: Date;
+    parentId: string;
+    institutionId: string;
+    preferences: Preferences[];
+    gender: Gender;
 }
 
 const KidSchema: Schema = new Schema(
@@ -27,11 +33,16 @@ const KidSchema: Schema = new Schema(
         institutionId: {
             type: String,
             required: false,
-        }, // Optional for institutions
+        },
         preferences: {
             type: [String],
-            enum: Object.values(Preferences), // Enforces that only values from the Preferences enum are allowed
-            default: [] // Default to an empty array if no preferences are specified
+            enum: Object.values(Preferences), // Enforces only values from Preferences
+            default: [], // Default to an empty array if no preferences are specified
+        },
+        gender: {
+            type: String,
+            enum: Object.values(Gender), // Restrict to Gender enum values
+            required: true, // Gender is required
         },
     },
     {

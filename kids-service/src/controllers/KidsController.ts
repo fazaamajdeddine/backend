@@ -5,8 +5,7 @@ import { AuthRequest } from "../middleware";
 
 const addKid = async (req: AuthRequest, res: Response) => {
     try {
-        const { name, dateOfBirth, institutionId, preferences, parentId } = req.body;
-
+        const { name, dateOfBirth, institutionId, preferences, parentId, gender } = req.body;
 
         const newKid = await Kid.create({
             name,
@@ -14,6 +13,7 @@ const addKid = async (req: AuthRequest, res: Response) => {
             parentId,
             institutionId,
             preferences,
+            gender, // Add gender
         });
 
         return res.json({
@@ -32,14 +32,14 @@ const addKid = async (req: AuthRequest, res: Response) => {
 const updateKid = async (req: AuthRequest, res: Response) => {
     try {
         const { kidId } = req.params;
-        const { name, dateOfBirth, institutionId, preferences } = req.body;
+        const { name, dateOfBirth, institutionId, preferences, gender } = req.body;
 
         // Ensure the user can only update their own kids
         const parentId = req.user;
 
         const updatedKid = await Kid.findOneAndUpdate(
             { _id: kidId, parentId },
-            { name, dateOfBirth, institutionId, preferences },
+            { name, dateOfBirth, institutionId, preferences, gender }, // Include gender
             { new: true, runValidators: true } // Returns the updated document
         );
 
@@ -59,7 +59,6 @@ const updateKid = async (req: AuthRequest, res: Response) => {
         });
     }
 };
-
 const getKids = async (req: AuthRequest, res: Response) => {
     try {
         const { institutionId } = req.query;

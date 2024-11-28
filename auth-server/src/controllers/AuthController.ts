@@ -14,37 +14,30 @@ const cookieOptions = {
     expires: expirationDate,
     secure: false,
     httpOnly: true,
-    path: '/', // Allow the cookie to be sent to all routes
-
+    path: "/", // Allow the cookie to be sent to all routes
 };
 
-const register = async (req: Request, res: Response) : Promise<void> => {
+const register = async (req: Request, res: Response): Promise<void> => {
     try {
         const { firstName, lastName, role, email, password } = req.body;
 
-        // Validate required fields
         if (!firstName || !lastName || !role || !email || !password) {
             throw new ApiError(400, "All fields are required");
         }
 
-       
-
-        // Check if user already exists
         const userExists = await User.findOne({ email });
         if (userExists) {
             throw new ApiError(400, "User already exists!");
         }
 
-        // Create a new user
         const user = await User.create({
             firstName,
             lastName,
             role,
             email,
-            password: await encryptPassword(password), // Encrypt password
+            password: await encryptPassword(password),
         });
 
-        // Prepare user data for response
         const userData = {
             id: user._id,
             firstName: user.firstName,
@@ -53,18 +46,16 @@ const register = async (req: Request, res: Response) : Promise<void> => {
             email: user.email,
         };
 
-         res.json({
+        res.json({
             status: 200,
             message: "User registered successfully!",
             data: userData,
         });
-        return
     } catch (error: any) {
-         res.status(500).json({
+        res.status(500).json({
             status: 500,
             message: error.message,
         });
-        return
     }
 };
 
@@ -83,40 +74,79 @@ const createSendToken = async (user: IUser, res: Response) => {
     return token;
 };
 
-const login = async (req: Request, res: Response) : Promise<void> => {
+const login = async (req: Request, res: Response): Promise<void> => {
     try {
         const { email, password } = req.body;
 
-        // Validate required fields
         if (!email || !password) {
             throw new ApiError(400, "Email and password are required");
         }
 
-        // Find user by email
         const user = await User.findOne({ email }).select("+password");
         if (!user || !(await isPasswordMatch(password, user.password as string))) {
             throw new ApiError(400, "Incorrect email or password");
         }
 
-        // Generate JWT and set it as a cookie
         const token = await createSendToken(user!, res);
 
-         res.json({
+        res.json({
             status: 200,
             message: "User logged in successfully!",
             token,
         });
-        return
     } catch (error: any) {
-         res.status(500).json({
+        res.status(500).json({
             status: 500,
             message: error.message,
         });
-        return
     }
+};
+
+// Fetch current user
+const currentUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const token = req.cookies.jwt;
+
+        if (!token) {
+            throw new ApiError(401, "Not authenticated");
+        }
+
+        const decoded: any = jwt.verify(token, jwtSecret);
+        const user = await User.findById(decoded.id).select("-password");
+
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+
+        res.json({
+            status: 200,
+            data: user,
+        });
+    } catch (error: any) {
+        res.status(401).json({
+            status: 401,
+            message: error.message || "Authentication failed",
+        });
+    }
+};
+
+// Logout user
+const logout = (req: Request, res: Response): void => {
+    res.clearCookie("jwt", {
+        httpOnly: true,
+        secure: false,
+        path: "/",
+    });
+
+    res.json({
+        status: 200,
+        message: "Logged out successfully!",
+    });
 };
 
 export default {
     register,
     login,
+    currentUser,
+    logout,
 };
