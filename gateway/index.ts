@@ -9,7 +9,7 @@ const auth = proxy("http://localhost:8081");
 const kids = proxy("http://localhost:8082");
 
 app.use("/api/auth", auth);
-app.use("/api/messages", kids);
+app.use("/api/kids", kids);
 
 const server = app.listen(8080, () => {
     console.log("Gateway is Listening to Port 8080");

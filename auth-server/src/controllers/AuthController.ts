@@ -88,11 +88,12 @@ const login = async (req: Request, res: Response): Promise<void> => {
         }
 
         const token = await createSendToken(user!, res);
-
+        
         res.json({
             status: 200,
             message: "User logged in successfully!",
             token,
+            user,
         });
     } catch (error: any) {
         res.status(500).json({
