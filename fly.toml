@@ -1,0 +1,20 @@
+# fly.toml app configuration file generated for backend-palmyra on 2024-12-08T03:52:10+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'backend-palmyra'
+primary_region = 'arn'
+
+[http_service]
+  internal_port = 85
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
