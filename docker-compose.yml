@@ -10,7 +10,7 @@ services:
 
   auth:
     build:
-      context: ./auth-service
+      context: ./auth-server
       dockerfile: Dockerfile
     ports:
       - "8081:8081"
