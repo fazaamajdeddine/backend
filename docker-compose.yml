@@ -8,9 +8,9 @@ services:
     volumes:
       - mongo-data:/data/db
 
-  user:
+  auth:
     build:
-      context: ./user-service
+      context: ./auth-service
       dockerfile: Dockerfile
     ports:
       - "8081:8081"
@@ -20,23 +20,12 @@ services:
     environment:
       - NODE_ENV=production
 
-  chat:
+  kids:
     build:
-      context: ./chat-service
+      context: ./kids-service
       dockerfile: Dockerfile
     ports:
       - "8082:8082"
-    depends_on:
-      - "mongodb"
-    environment:
-      - NODE_ENV=production
-
-  notification:
-    build:
-      context: ./notification-service
-      dockerfile: Dockerfile
-    ports:
-      - "8083:8083"
     depends_on:
       - "mongodb"
     environment:
@@ -49,9 +38,8 @@ services:
     ports:
       - "85:85"
     depends_on:
-      - user
-      - chat
-      - notification
+      - auth
+      - kids
 
 volumes:
   mongo-data:
