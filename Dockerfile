@@ -1,7 +1,7 @@
 # Use Docker Compose to build the services
 FROM docker/compose:latest
 
-WORKDIR /app
+WORKDIR /backend
 
 COPY . .
 
